@@ -8,7 +8,7 @@ class ReadingVimrc
     @messages = []
   end
 
-  def is_running?
+  def running?
     @is_running_
   end
 
@@ -30,11 +30,11 @@ class ReadingVimrc
   end
 
   def status
-    is_running? ? "started" : "stopped"
+    running? ? "started" : "stopped"
   end
 
   def add(message)
-    @messages << message if is_running?
+    @messages << message if running?
   end
 end
 
