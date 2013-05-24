@@ -33,7 +33,7 @@ post '/reading_vimrc' do
   content_type :text
   json = JSON.parse(request.body.string)
   json["events"].select {|e| e['message'] }.map {|e|
-    case = e["message"]["text"]
+    case e["message"]["text"]
     when /^!reading_vimrc[\s　]start$/
       reading_vimrc.start
       "started"
