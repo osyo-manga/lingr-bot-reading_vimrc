@@ -29,7 +29,7 @@ EOS
 
 
 get '/reading_vimrc' do
-	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.join('<br>')}"
+	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.sort.members.join('<br>')}"
 end
 
 
@@ -61,7 +61,7 @@ post '/reading_vimrc' do
 			return names.inject(Hash.new(0)) { 
 				|h,o| h[o]+=1; h
 			}.sort_by { |k,v| -v }.map { |name, count|
-				"#{count}回 : #{name}"
+				"#{sprintf("%03d", count)}回 : #{name}"
 			}.join("\n")
 		end
 		if /^!reading_vimrc[\s　]reset$/ =~ text
