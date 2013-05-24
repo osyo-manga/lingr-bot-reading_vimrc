@@ -5,11 +5,9 @@ require 'json'
 require "mechanize"
 load "reading_vimrc.rb"
 
-
 get '/' do
   "Hello, world"
 end
-
 
 reading_vimrc = ReadingVimrc.new
 
@@ -27,11 +25,9 @@ vimrc読書会で発言した人を集計するための bot です
 "help":    使い方を出力
 EOS
 
-
 get '/reading_vimrc' do
   "status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.join('<br>')}"
 end
-
 
 post '/reading_vimrc' do
   content_type :text
@@ -52,7 +48,7 @@ post '/reading_vimrc' do
     when /^!reading_vimrc[\s　]member_with_count$/
       names = reading_vimrc.messages.map {|mes| mes[:name] }
       return "だれもいませんでした" if names.empty?
-      names.inject(Hash.new(0)) { 
+      names.inject(Hash.new(0)) {
         |h,o| h[o]+=1; h
       }.sort_by { |k,v| -v }.map { |name, count|
         "#{count}回 : #{name}"
@@ -69,5 +65,3 @@ post '/reading_vimrc' do
     end
   }.join
 end
-
-
