@@ -1,6 +1,8 @@
 # -*- encoding: UTF-8 -*-
 
 class ReadingVimrc
+  attr_reader :messages
+
   def initialize
     @is_running_ = false
     @messages = []
@@ -25,10 +27,6 @@ class ReadingVimrc
 
   def members
     @messages.map {|mes| mes[:name] }.uniq
-  end
-
-  def messages
-    @messages
   end
 
   def status
