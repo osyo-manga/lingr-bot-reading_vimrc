@@ -37,23 +37,19 @@ post '/reading_vimrc' do
   content_type :text
   json = JSON.parse(request.body.string)
   json["events"].select {|e| e['message'] }.map {|e|
-    text = e["message"]["text"]
-    if /^!reading_vimrc[\s　]start$/ =~ text
+    case = e["message"]["text"]
+    when /^!reading_vimrc[\s　]start$/
       reading_vimrc.start
       return "started"
-    end
-    if /^!reading_vimrc[\s　]stop$/ =~ text
+    when /^!reading_vimrc[\s　]stop$/
       reading_vimrc.stop
       return "stoped"
-    end
-    if /^!reading_vimrc[\s　]status$/ =~ text
+    when /^!reading_vimrc[\s　]status$/
       return reading_vimrc.status
-    end
-    if /^!reading_vimrc[\s　]member$/ =~ text
+    when /^!reading_vimrc[\s　]member$/
       members = reading_vimrc.members
       return members.empty? ? "だれもいませんでした" : members.sort.join("\n")
-    end
-    if /^!reading_vimrc[\s　]member_with_count$/ =~ text
+    when /^!reading_vimrc[\s　]member_with_count$/
       names = reading_vimrc.messages.map {|mes| mes[:name] }
       return "だれもいませんでした" if names.empty?
       return names.inject(Hash.new(0)) { 
@@ -61,18 +57,15 @@ post '/reading_vimrc' do
       }.sort_by { |k,v| -v }.map { |name, count|
         "#{count}回 : #{name}"
       }.join("\n")
-    end
-    if /^!reading_vimrc[\s　]reset$/ =~ text
+    when /^!reading_vimrc[\s　]reset$/
       return reading_vimrc.reset
-    end
-    if /^!reading_vimrc[\s　]help$/ =~ text
+    when /^!reading_vimrc[\s　]help$/
       return reading_vimrc_help
-    end
-
-    if /^!reading_vimrc[\s　]*(.+)$/ =~ text
+    when /^!reading_vimrc[\s　]*(.+)$/
       return "Not found command"
+    else
+      reading_vimrc.add({:name => e["message"]["nickname"], :text => text})
     end
-    reading_vimrc.add({:name => e["message"]["nickname"], :text => text})
   }
   return ""
 end
