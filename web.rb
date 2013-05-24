@@ -58,8 +58,10 @@ post '/reading_vimrc' do
 			if names.empty?
 				return "だれもいませんでした"
 			end
-			return names.uniq.map {|name|
-				"#{names.count { |s| s == name }}回 : #{name}"
+			return names.inject(Hash.new(0)) { 
+				|h,o| h[o]+=1; h
+			}.sort_by { |k,v| -v }.map { |name, count|
+				"#{count}回 : #{name}"
 			}.join("\n")
 		end
 		if /^!reading_vimrc[\s　]reset$/ =~ text
