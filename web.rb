@@ -29,7 +29,7 @@ EOS
 
 
 get '/reading_vimrc' do
-	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.sort.members.join('<br>')}"
+	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.sort.join('<br>')}"
 end
 
 
