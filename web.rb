@@ -3,45 +3,11 @@
 require 'sinatra'
 require 'json'
 require "mechanize"
+load "reading_vimrc.rb"
 
 
 get '/' do
 	"Hello, world"
-end
-
-
-class ReadingVimrc
-	def initialize
-		@is_running_ = false
-		@messages = []
-	end
-
-	def is_running?
-		@is_running_
-	end
-
-	def start
-		@is_running_ = true
-		@messages = []
-	end
-
-	def stop
-		@is_running_ = false
-	end
-	
-	def members
-		@messages.map {|mes| mes[:name] }.uniq
-	end
-
-	def status
-		is_running? ? "started" : "stopped"
-	end
-
-	def add(message)
-		if is_running?
-			@messages << message
-		end
-	end
 end
 
 
@@ -52,10 +18,12 @@ vimrc読書会で発言した人を集計するための bot です
 
 !reading_vimrc {command}
 
-"start"  : 集計の開始
+"start"  : 集計の開始、"member" は "reset" される
 "stop"   : 集計の終了
 "status" : ステータスの出力
 "member" : "start" ～ "stop" の間に発言した人を列挙
+"member_with_count" : "member" に発言数も追加して列挙
+"reset"  : "member" をリセット
 "help"   : 使い方を出力
 EOS
 
@@ -85,13 +53,26 @@ post '/reading_vimrc' do
 			members = reading_vimrc.members
 			return members.empty? ? "だれもいませんでした" : members.join("\n")
 		end
+		if /^!reading_vimrc[\s　]member_with_count$/ =~ text
+			names = reading_vimrc.messages.map {|mes| mes[:name] }
+			if names.empty?
+				return "だれもいませんでした"
+			end
+			return names.uniq.map {|name|
+				"#{names.count { |s| s == name }}回 : #{name}"
+			}.join("\n")
+		end
+		if /^!reading_vimrc[\s　]reset$/ =~ text
+			return reading_vimrc.reset
+		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help
 		end
+
 		if /^!reading_vimrc[\s　]*(.+)$/ =~ text
 			return "Not found command"
 		end
-		reading_vimrc.add({:name => e["message"]["speaker_id"], :text => text})
+		reading_vimrc.add({:name => e["message"]["nickname"], :text => text})
 	}
 	return ""
 end
