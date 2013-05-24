@@ -49,7 +49,7 @@ post '/reading_vimrc' do
       names = reading_vimrc.messages.map {|mes| mes[:name] }
       return "だれもいませんでした" if names.empty?
       names.inject(Hash.new(0)) {|h,o| h[o]+=1; h }.
-        sort_by { |k,v| -v }.map {|name, count| "#{count}回 : #{name}" }.
+        sort_by {|k,v| -v }.map {|name, count| "#{count}回 : #{name}" }.
         join("\n")
     when /^!reading_vimrc[\s　]reset$/
       reading_vimrc.reset
