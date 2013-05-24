@@ -40,34 +40,34 @@ post '/reading_vimrc' do
     case = e["message"]["text"]
     when /^!reading_vimrc[\s　]start$/
       reading_vimrc.start
-      return "started"
+      "started"
     when /^!reading_vimrc[\s　]stop$/
       reading_vimrc.stop
-      return "stoped"
+      "stoped"
     when /^!reading_vimrc[\s　]status$/
-      return reading_vimrc.status
+      reading_vimrc.status
     when /^!reading_vimrc[\s　]member$/
       members = reading_vimrc.members
-      return members.empty? ? "だれもいませんでした" : members.sort.join("\n")
+      members.empty? ? "だれもいませんでした" : members.sort.join("\n")
     when /^!reading_vimrc[\s　]member_with_count$/
       names = reading_vimrc.messages.map {|mes| mes[:name] }
       return "だれもいませんでした" if names.empty?
-      return names.inject(Hash.new(0)) { 
+      names.inject(Hash.new(0)) { 
         |h,o| h[o]+=1; h
       }.sort_by { |k,v| -v }.map { |name, count|
         "#{count}回 : #{name}"
       }.join("\n")
     when /^!reading_vimrc[\s　]reset$/
-      return reading_vimrc.reset
+      reading_vimrc.reset
     when /^!reading_vimrc[\s　]help$/
-      return reading_vimrc_help
+      reading_vimrc_help
     when /^!reading_vimrc[\s　]*(.+)$/
-      return "Not found command"
+      "Not found command"
     else
       reading_vimrc.add({:name => e["message"]["nickname"], :text => text})
+      ''
     end
-  }
-  return ""
+  }.join
 end
 
 
