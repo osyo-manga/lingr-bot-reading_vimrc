@@ -51,7 +51,7 @@ post '/reading_vimrc' do
 		end
 		if /^!reading_vimrc[\s　]member$/ =~ text
 			members = reading_vimrc.members
-			return members.empty? ? "だれもいませんでした" : members.join("\n")
+			return members.empty? ? "だれもいませんでした" : members.sort.join("\n")
 		end
 		if /^!reading_vimrc[\s　]member_with_count$/ =~ text
 			names = reading_vimrc.messages.map {|mes| mes[:name] }
