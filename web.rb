@@ -55,9 +55,7 @@ post '/reading_vimrc' do
     end
     if /^!reading_vimrc[\s　]member_with_count$/ =~ text
       names = reading_vimrc.messages.map {|mes| mes[:name] }
-      if names.empty?
-        return "だれもいませんでした"
-      end
+      return "だれもいませんでした" if names.empty?
       return names.inject(Hash.new(0)) { 
         |h,o| h[o]+=1; h
       }.sort_by { |k,v| -v }.map { |name, count|
