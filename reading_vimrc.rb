@@ -36,9 +36,7 @@ class ReadingVimrc
   end
 
   def add(message)
-    if is_running?
-      @messages << message
-    end
+    @messages << message if is_running?
   end
 end
 
