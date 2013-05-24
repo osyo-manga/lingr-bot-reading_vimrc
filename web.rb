@@ -60,7 +60,7 @@ post '/reading_vimrc' do
     when /^!reading_vimrc[\s　]*(.+)$/
       "Not found command"
     else
-      reading_vimrc.add({:name => e["message"]["nickname"], :text => text})
+      reading_vimrc.add({name: e["message"]["nickname"], text: text})
       ''
     end
   }.join
