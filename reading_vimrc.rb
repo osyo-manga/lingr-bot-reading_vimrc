@@ -4,6 +4,7 @@ class ReadingVimrc
 	def initialize
 		@is_running_ = false
 		@messages = []
+		@restore_cache = []
 	end
 
 	def running?
@@ -20,6 +21,7 @@ class ReadingVimrc
 	end
 	
 	def reset
+		@restore_cache = @messages
 		@messages = []
 	end
 
@@ -39,6 +41,10 @@ class ReadingVimrc
 		if running?
 			@messages << message
 		end
+	end
+
+	def restore
+		@restore_cache, @messages = @messages, @restore_cache
 	end
 end
 

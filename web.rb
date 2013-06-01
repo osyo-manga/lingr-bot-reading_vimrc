@@ -26,13 +26,14 @@ vimrc読書会で発言した人を集計するための bot です
 
 !reading_vimrc {command}
 
-"start"  : 集計の開始、"member" は "reset" される（owner）
-"stop"   : 集計の終了（owner）
-"status" : ステータスの出力
-"member" : "start" ～ "stop" の間に発言した人を列挙
+"start"   : 集計の開始、"member" は "reset" される（owner）
+"stop"    : 集計の終了（owner）
+"reset"   : "member" をリセット（owner）
+"restore" : "member" を1つ前に戻す（owner）
+"status"  : ステータスの出力
+"member"  : "start" ～ "stop" の間に発言した人を列挙
 "member_with_count" : "member" に発言数も追加して列挙
-"reset"  : "member" をリセット（owner）
-"help"   : 使い方を出力
+"help"    : 使い方を出力
 EOS
 
 
@@ -56,6 +57,14 @@ post '/reading_vimrc' do
 			reading_vimrc.stop
 			return "stoped"
 		end
+		if /^!reading_vimrc[\s　]reset$/ =~ text && owner?(name)
+			reading_vimrc.reset
+			return "reset"
+		end
+		if /^!reading_vimrc[\s　]restore$/ =~ text && owner?(name)
+			reading_vimrc.restore
+			return "restore"
+		end
 		if /^!reading_vimrc[\s　]status$/ =~ text
 			return reading_vimrc.status
 		end
@@ -71,10 +80,6 @@ post '/reading_vimrc' do
 			return names.inject(Hash.new(0)) { |h,o| h[o]+=1; h }
 				.sort_by {|k,v| -v}.map {|name, count| "#{"%03d" % count}回 : #{name}" }
 				.join("\n")
-		end
-		if /^!reading_vimrc[\s　]reset$/ =~ text && owner?(name)
-			reading_vimrc.reset
-			return "reset"
 		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help
