@@ -61,7 +61,7 @@ post '/reading_vimrc' do
 			return names.inject(Hash.new(0)) { 
 				|h,o| h[o]+=1; h
 			}.sort_by { |k,v| -v }.map { |name, count|
-				"#{sprintf("%03d", count)}回 : #{name}"
+				"#{"%03d" % count}回 : #{name}"
 			}.join("\n")
 		end
 		if /^!reading_vimrc[\s　]reset$/ =~ text
