@@ -6,8 +6,16 @@ require "mechanize"
 load "reading_vimrc.rb"
 
 
+
 get '/' do
 	"Hello, world"
+end
+
+
+OWNER = ["manga_osyo", "thinca"]
+
+def owner?(name)
+	!!OWNER.index(name)
 end
 
 
@@ -38,11 +46,13 @@ post '/reading_vimrc' do
 	json = JSON.parse(request.body.string)
 	json["events"].select {|e| e['message'] }.map {|e|
 		text = e["message"]["text"]
-		if /^!reading_vimrc[\s　]start$/ =~ text
+		name = e["message"]["nickname"]
+
+		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(name)
 			reading_vimrc.start
 			return "started"
 		end
-		if /^!reading_vimrc[\s　]stop$/ =~ text
+		if /^!reading_vimrc[\s　]stop$/ =~ text && owner?(name)
 			reading_vimrc.stop
 			return "stoped"
 		end
@@ -62,7 +72,7 @@ post '/reading_vimrc' do
 				.sort_by {|k,v| -v}.map {|name, count| "#{"%03d" % count}回 : #{name}" }
 				.join("\n")
 		end
-		if /^!reading_vimrc[\s　]reset$/ =~ text
+		if /^!reading_vimrc[\s　]reset$/ =~ text && owner?(name)
 			return reading_vimrc.reset
 		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
@@ -72,7 +82,7 @@ post '/reading_vimrc' do
 		if /^!reading_vimrc[\s　]*(.+)$/ =~ text
 			return "Not found command"
 		end
-		reading_vimrc.add({name: e["message"]["nickname"], text: text})
+		reading_vimrc.add({name: name, text: text})
 	}
 	return ""
 end

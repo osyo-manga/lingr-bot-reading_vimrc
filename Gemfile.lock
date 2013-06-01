@@ -5,7 +5,6 @@ GEM
     domain_name (0.5.11)
       unf (>= 0.0.5, < 1.0.0)
     eventmachine (1.0.0-x86-mingw32)
-    json (1.7.7)
     mechanize (2.6.0)
       domain_name (~> 0.5, >= 0.5.1)
       mime-types (~> 1.17, >= 1.17.2)
@@ -40,7 +39,6 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  json
   mechanize (= 2.6.0)
   sinatra
   thin
