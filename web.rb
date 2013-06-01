@@ -26,12 +26,12 @@ vimrc読書会で発言した人を集計するための bot です
 
 !reading_vimrc {command}
 
-"start"  : 集計の開始、"member" は "reset" される
-"stop"   : 集計の終了
+"start"  : 集計の開始、"member" は "reset" される（owner）
+"stop"   : 集計の終了（owner）
 "status" : ステータスの出力
 "member" : "start" ～ "stop" の間に発言した人を列挙
 "member_with_count" : "member" に発言数も追加して列挙
-"reset"  : "member" をリセット
+"reset"  : "member" をリセット（owner）
 "help"   : 使い方を出力
 EOS
 
@@ -73,7 +73,8 @@ post '/reading_vimrc' do
 				.join("\n")
 		end
 		if /^!reading_vimrc[\s　]reset$/ =~ text && owner?(name)
-			return reading_vimrc.reset
+			reading_vimrc.reset
+			return "reset"
 		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help
