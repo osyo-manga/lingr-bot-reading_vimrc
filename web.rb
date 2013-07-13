@@ -38,7 +38,12 @@ EOS
 
 
 get '/reading_vimrc' do
-	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.sort.join('<br>')}"
+	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.sort.join('<br>')}<br>link: #{reading_vimrc.start_link}<br>"
+end
+
+def to_lingr_link(message)
+	time = message["timestamp"].match(/(.*)T/).to_a[1].gsub(/-/, '/')
+	return "http://lingr.com/room/#{message["room"]}/archives/#{time}/#message-#{message["id"]}"
 end
 
 
@@ -48,9 +53,13 @@ post '/reading_vimrc' do
 	json["events"].select {|e| e['message'] }.map {|e|
 		text = e["message"]["text"]
 		name = e["message"]["nickname"]
-
+		
+		if /^=== 第\d+回 vimrc読書会 ===/ =~ text && owner?(name)
+			reading_vimrc.start to_lingr_link(e["message"])
+			return "started"
+		end
 		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(name)
-			reading_vimrc.start
+			reading_vimrc.start to_lingr_link(e["message"])
 			return "started"
 		end
 		if /^!reading_vimrc[\s　]stop$/ =~ text && owner?(name)
@@ -70,7 +79,7 @@ post '/reading_vimrc' do
 		end
 		if /^!reading_vimrc[\s　]member$/ =~ text
 			members = reading_vimrc.members
-			return members.empty? ? "だれもいませんでした" : members.sort.join("\n")
+			return members.empty? ? "だれもいませんでした" : members.sort.join("\n") + "\n" + members.start_link
 		end
 		if /^!reading_vimrc[\s　]member_with_count$/ =~ text
 			names = reading_vimrc.messages.map {|mes| mes[:name] }
@@ -79,7 +88,7 @@ post '/reading_vimrc' do
 			end
 			return names.inject(Hash.new(0)) { |h,o| h[o]+=1; h }
 				.sort_by {|k,v| -v}.map {|name, count| "#{"%03d" % count}回 : #{name}" }
-				.join("\n")
+				.join("\n") + "\n" + members.start_link
 		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help

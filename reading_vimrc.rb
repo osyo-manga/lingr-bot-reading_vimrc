@@ -1,7 +1,9 @@
 # -*- encoding: UTF-8 -*-
 
 class ReadingVimrc
+	attr_reader :start_link
 	def initialize
+		@start_link = ""
 		@is_running_ = false
 		@messages = []
 		@restore_cache = []
@@ -11,8 +13,9 @@ class ReadingVimrc
 		@is_running_
 	end
 
-	def start
+	def start(link = "")
 		@is_running_ = true
+		@start_link = link
 		reset
 	end
 
