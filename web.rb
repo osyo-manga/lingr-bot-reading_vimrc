@@ -2,7 +2,6 @@
 # https://github.com/raa0121/raa0121-lingrbot/blob/master/dice.rb
 require 'sinatra'
 require 'json'
-require "mechanize"
 load "reading_vimrc.rb"
 
 
@@ -79,7 +78,7 @@ post '/reading_vimrc' do
 		end
 		if /^!reading_vimrc[\s　]member$/ =~ text
 			members = reading_vimrc.members
-			return members.empty? ? "だれもいませんでした" : members.sort.join("\n") + "\n" + members.start_link
+			return members.empty? ? "だれもいませんでした" : members.sort.join("\n") + "\n" + reading_vimrc.start_link
 		end
 		if /^!reading_vimrc[\s　]member_with_count$/ =~ text
 			names = reading_vimrc.messages.map {|mes| mes[:name] }
@@ -88,7 +87,7 @@ post '/reading_vimrc' do
 			end
 			return names.inject(Hash.new(0)) { |h,o| h[o]+=1; h }
 				.sort_by {|k,v| -v}.map {|name, count| "#{"%03d" % count}回 : #{name}" }
-				.join("\n") + "\n" + members.start_link
+				.join("\n") + "\n" + reading_vimrc.start_link
 		end
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help
