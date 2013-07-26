@@ -64,7 +64,7 @@ post '/reading_vimrc' do
 		end
 		if /^!reading_vimrc[\s　]stop$/ =~ text && owner?(speaker_id)
 			reading_vimrc.stop
-			return "stoped"
+			return "stopped"
 		end
 		if /^!reading_vimrc[\s　]reset$/ =~ text && owner?(speaker_id)
 			reading_vimrc.reset
