@@ -30,7 +30,10 @@ class Chop
 		JSON.parse(response.body)
 	end
 
-	def post_comment(line, text)
+	def post_comment(text, line_start, line_end = line_start)
+		if line_start > line_end
+			return
+		end
 		id = @chop["token"]
 		uri = URI.parse("http://chopapp.com/notes")
 		
@@ -38,7 +41,7 @@ class Chop
 		header = {
 		  "user-agent" => "Ruby/#{RUBY_VERSION} MyHttpClient"
 		}
-		body = "code_snip_id=#{id}&isNew=0&line_start=#{line}&line_end=#{line}&text=#{ERB::Util.url_encode text}"
+		body = "code_snip_id=#{id}&isNew=0&line_start=#{line_start}&line_end=#{line_end}&text=#{ERB::Util.url_encode text}"
 		response = http.post(uri.path, body, header)
 		JSON.parse(response.body)
 	end
@@ -95,15 +98,20 @@ class ReadingVimrc
 	def add(message)
 		if running?
 			@messages << message
-			puts message
-			if @chop && /L\d+[\s　]+.+/ =~ message[:text]
+			if @chop
 				name = message[:name]
-				line = message[:text][/L(\d+).*/, 1].to_i
-				comment = message[:text][/L\d+[\ 　]+(.*)/, 1]
-				puts name
-				puts line
-				puts comment
-				@chop.post_comment(line, "#{name} > #{comment}")
+				text = message[:text]
+				case text
+				when /L\d+\-\d+.*/
+					first_line = message[:text][/L(\d)+\-\d+[\s　]+.+/, 1].to_i
+					end_line = message[:text][/L\d+\-(\d)+[\s　]+.+/, 1].to_i
+					comment = message[:text][/L\d+[\ 　]+(.*)/, 1]
+					@chop.post_comment("#{name} > #{comment}", first_line, end_line)
+				when /L\d+.*/
+					first_line = message[:text][/L(\d+).*/, 1].to_i
+					comment = message[:text][/L\d+[\ 　]+(.*)/, 1]
+					@chop.post_comment("#{name} > #{comment}", first_line)
+				end
 			end
 		end
 	end
