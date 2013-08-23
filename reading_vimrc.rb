@@ -102,14 +102,14 @@ class ReadingVimrc
 				name = message[:name]
 				text = message[:text]
 				case text
-				when /L\d+\-\d+.*/
-					first_line = message[:text][/L(\d)+\-\d+[\s　]+.+/, 1].to_i
-					end_line = message[:text][/L\d+\-(\d)+[\s　]+.+/, 1].to_i
-					comment = message[:text][/L\d+[\ 　]+(.*)/, 1]
+				when /L\d+\-\d+[\s　]+.+/
+					first_line = text[/L(\d+)\-\d+[\s　]+.+/, 1].to_i
+					end_line = text[/L\d+\-(\d+)[\s　]+.+/, 1].to_i
+					comment = text[/L\d+\-\d+[\s　]+(.+)/, 1]
 					@chop.post_comment("#{name} > #{comment}", first_line, end_line)
-				when /L\d+.*/
-					first_line = message[:text][/L(\d+).*/, 1].to_i
-					comment = message[:text][/L\d+[\ 　]+(.*)/, 1]
+				when /L\d+[\s　]+.+/
+					first_line = text[/L(\d+).*/, 1].to_i
+					comment = text[/L\d+[\s　]+(.*)/, 1]
 					@chop.post_comment("#{name} > #{comment}", first_line)
 				end
 			end
