@@ -33,11 +33,13 @@ vimrc読書会で発言した人を集計するための bot です
 "member"  : "start" ～ "stop" の間に発言した人を列挙
 "member_with_count" : "member" に発言数も追加して列挙
 "help"    : 使い方を出力
+"chop {raw.github url}" : chop （owner）
+"chop_url" : chop page
 EOS
 
 
 get '/reading_vimrc' do
-	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.sort.join('<br>')}<br>link: #{reading_vimrc.start_link}<br>"
+	"status: #{reading_vimrc.status}<br>members<br>#{reading_vimrc.members.sort.join('<br>')}<br>link: #{reading_vimrc.start_link}<br>chop: #{reading_vimrc.chop_url}"
 end
 
 def to_lingr_link(message)
@@ -90,10 +92,23 @@ post '/reading_vimrc' do
 				.sort_by {|k,v| -v}.map {|name, count| "#{"%03d" % count}回 : #{name}" }
 				.join("\n") + "\n" + reading_vimrc.start_link
 		end
+
+		if /^!reading_vimrc[\s　]+chop[\s　]+.+$/ =~ text && owner?(speaker_id)
+			url = text[/^!reading_vimrc[\s　]+chop[\s　]+(.+)$/, 1]
+			chop_url = reading_vimrc.chop(url)
+			return chop_url.empty? ? "無効な URL です" : chop_url
+		end
+
+		if /^!reading_vimrc[\s　]chop_url$/ =~ text
+			chop_url = reading_vimrc.cho_url
+			return chop_url.empty? ? "ありません" : chop_url
+		end
+
 		if /^!reading_vimrc[\s　]help$/ =~ text
 			return reading_vimrc_help
 		end
 
+		
 		if /^!reading_vimrc[\s　]*(.+)$/ =~ text
 			return "Not found command"
 		end
