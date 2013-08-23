@@ -66,6 +66,7 @@ class ReadingVimrc
 	def start(link = "")
 		@is_running_ = true
 		@start_link = link
+		@chop = nil
 		reset
 	end
 
