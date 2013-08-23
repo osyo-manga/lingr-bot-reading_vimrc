@@ -100,7 +100,7 @@ post '/reading_vimrc' do
 		end
 
 		if /^!reading_vimrc[\s　]chop_url$/ =~ text
-			chop_url = reading_vimrc.cho_url
+			chop_url = reading_vimrc.chop_url
 			return chop_url.empty? ? "ありません" : chop_url
 		end
 
