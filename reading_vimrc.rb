@@ -13,17 +13,18 @@ class Chop
 		if /https:\/\/raw.github.com\// =~ url
 			agent = Mechanize.new
 			agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
-			@chop = post_code("c", agent.get(url).body)
+			@chop = post_code("c", agent.get(url).body, url)
 		end
 	end
 
-	def post_code(lang, code)
+	def post_code(lang, code, base_url)
 		uri = URI.parse("http://chopapp.com/code_snips")
 		
 		http = Net::HTTP.new(uri.host, uri.port)
 		header = {
 		  "user-agent" => "Ruby/#{RUBY_VERSION} MyHttpClient"
 		}
+		code = "\" original source : #{base_url}\n#{code}"
 		body = "language=#{lang}&code=#{ERB::Util.url_encode code}"
 		response = http.post(uri.path, body, header)
 		JSON.parse(response.body)
@@ -37,7 +38,7 @@ class Chop
 		header = {
 		  "user-agent" => "Ruby/#{RUBY_VERSION} MyHttpClient"
 		}
-		body = "code_snip_id=#{id}&isNew=0&line_start=#{line-1}&line_end=#{line-1}&text=#{ERB::Util.url_encode text}"
+		body = "code_snip_id=#{id}&isNew=0&line_start=#{line}&line_end=#{line}&text=#{ERB::Util.url_encode text}"
 		response = http.post(uri.path, body, header)
 		JSON.parse(response.body)
 	end
