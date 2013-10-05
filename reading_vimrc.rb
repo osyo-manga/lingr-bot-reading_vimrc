@@ -5,6 +5,7 @@ require 'mechanize'
 require "uri"
 require "json"
 require 'erb'
+require "cgi"
 
 
 class Chop
@@ -41,7 +42,8 @@ class Chop
 		header = {
 		  "user-agent" => "Ruby/#{RUBY_VERSION} MyHttpClient"
 		}
-		body = "code_snip_id=#{id}&isNew=0&line_start=#{line_start}&line_end=#{line_end}&text=#{ERB::Util.url_encode text}"
+		body = "code_snip_id=#{id}&isNew=0&line_start=#{line_start}&line_end=#{line_end}&text=#{ERB::Util.url_encode CGI.escapeHTML text}"
+		puts body
 		response = http.post(uri.path, body, header)
 		JSON.parse(response.body)
 	end
@@ -102,12 +104,12 @@ class ReadingVimrc
 				name = message[:name]
 				text = message[:text]
 				case text
-				when /L\d+\-\d+[\s　]+.+/
+				when /^L\d+\-\d+[\s　]+.+/
 					first_line = text[/L(\d+)\-\d+[\s　]+.+/, 1].to_i
 					end_line = text[/L\d+\-(\d+)[\s　]+.+/, 1].to_i
 					comment = text[/L\d+\-\d+[\s　]+(.+)/, 1]
 					@chop.post_comment("#{name} > #{comment}", first_line, end_line)
-				when /L\d+[\s　]+.+/
+				when /^L\d+[\s　]+.+/
 					first_line = text[/L(\d+).*/, 1].to_i
 					comment = text[/L\d+[\s　]+(.*)/, 1]
 					@chop.post_comment("#{name} > #{comment}", first_line)
