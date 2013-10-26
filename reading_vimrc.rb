@@ -11,10 +11,12 @@ require "cgi"
 class Chop
 	def initialize(url)
 		@chop = nil
-		if /https:\/\/raw.github.com\// =~ url
+		if /^https:\/\/raw\.github\.com\/.+/ =~ url
 			agent = Mechanize.new
 			agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
 			@chop = post_code("c", agent.get(url).body, url)
+		elsif  /^http:\/\/chopapp\.com\/.+/ =~ url
+			@chop = { "token" => url[/^http:\/\/chopapp\.com\/#(.+)/, 1] }
 		end
 	end
 
