@@ -11,7 +11,7 @@ get '/' do
 end
 
 
-OWNER = ["manga_osyo", "thinca", "deris0126", "rbtnn ", "LeafCage "]
+OWNER = ["manga_osyo", "thinca", "deris0126", "rbtnn", "LeafCage", "haya14busa"]
 
 def owner?(name)
 	!!OWNER.index(name)
