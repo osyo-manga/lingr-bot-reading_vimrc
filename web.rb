@@ -57,29 +57,12 @@ get '/reading_vimrc/yml' do
   date: #{ Time.now.strftime("%Y-%m-%d") } 21:00
   day: Sat
   plugins:
-    - name: junkfile.vim
-      author: Shougo
-      url: https://github.com/Shougo/junkfile.vim
-      hash: 13384f507ea515af84d0f138a48c53378c7b30f3
-    - name: vim-visualstar
-      author: thinca
-      url: https://github.com/thinca/vim-visualstar
-      hash: 04327d52ee3b9ad35d1f6ac8919a6365352b2262
+    - name: 
+      author: 
+      url: 
+      hash: 
   members:
 #{ member.map{ |m| "    - " + m }.join("\n") }
-    - DeaR
-    - cohama
-    - deris0126
-    - haya14busa
-    - itchyny
-    - lisia
-    - manga_osyo
-    - msmhrt
-    - raa0121
-    - supermomonga
-    - syui
-    - thinca
-    - zoncoen
   log: #{ log }
   links:
 EOS
