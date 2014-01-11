@@ -60,6 +60,7 @@ end
 class ReadingVimrc
 	attr_reader :id
 	attr_reader :target
+	attr_reader :download
 	attr_reader :date
 
 	attr_reader :start_link
@@ -71,6 +72,7 @@ class ReadingVimrc
 		@chop = nil
 		@id = 0
 		@target = ""
+		@download = ""
 		@date = Time.now
 	end
 
@@ -89,6 +91,10 @@ class ReadingVimrc
 
 	def set_target(target)
 		@target = target if target
+	end
+
+	def set_download(url)
+		@download = url if url
 	end
 
 	def stop

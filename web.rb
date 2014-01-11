@@ -55,7 +55,7 @@ get '/reading_vimrc/vimrc/markdown' do
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
 	github = reading_vimrc.target.split("/").drop(3)
-	url = "https://github.com/#{github[0]}/#{github[1]}"
+	url = "https://github.com/#{github[0]}"
 
 text = <<"EOS"
 ---
@@ -70,7 +70,7 @@ category: archive
 ### vimrc
 [#{ github[0] }](#{ url }) さんの vimrc を読みました。
 
-- [vimrc](#{ reading_vimrc.target }) ([ダウンロード](https://raw.github.com/shiracha/settings/b88d5e36326a0725cfb027ccf4635069fdc216c3/.vimrc))
+- [vimrc](#{ reading_vimrc.target }) ([ダウンロード](#{ reading_vimrc.download }))
 
 ### 参加者リスト
 
@@ -121,8 +121,9 @@ post '/reading_vimrc' do
 		
 		if (/^=== 第(\d+)回 vimrc読書会 ===/ =~ text || /^=== 第(\d+)回 Vimプラグイン読書会 ===/ =~ text) && owner?(speaker_id)
 			reading_vimrc.start to_lingr_link(e["message"]), $1
-			reading_vimrc.set_target text[/読むプラグイン: (https.*)\n/, 1]
-			reading_vimrc.set_target text[/本日のvimrc: (https.*)\n/, 1]
+			reading_vimrc.set_target   text[/読むプラグイン: (https.*)\n/, 1]
+			reading_vimrc.set_target   text[/本日のvimrc: (https.*)\n/, 1]
+			reading_vimrc.set_download text[/DL用リンク: (https.*)\n/, 1]
 			return "started"
 		end
 		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(speaker_id)
