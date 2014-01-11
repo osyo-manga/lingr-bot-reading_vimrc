@@ -48,6 +48,48 @@ def to_lingr_link(message)
 end
 
 
+
+get '/reading_vimrc/vimrc/markdown' do
+	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+	wdays = ["日", "月", "火", "水", "木", "金", "土"]
+	log = reading_vimrc.start_link
+	member = reading_vimrc.members.sort
+	github = reading_vimrc.target.split("/").drop(3)
+	url = "https://github.com/#{github[0]}/#{github[1]}"
+
+text = <<"EOS"
+---
+layout: archive
+title: 第#{ reading_vimrc.id }回 vimrc読書会
+category: archive
+---
+
+### 日時
+#{ reading_vimrc.date.strftime("%Y/%m/%d") }(土) 23:00-
+
+### vimrc
+[#{ github[0] }](#{ url }) さんの vimrc を読みました。
+
+- [vimrc](#{ reading_vimrc.target }) ([ダウンロード](https://raw.github.com/shiracha/settings/b88d5e36326a0725cfb027ccf4635069fdc216c3/.vimrc))
+
+### 参加者リスト
+
+#{ member.length }名。
+
+#{ member.map{ |m| "- " + m }.join("\n") }
+
+### ログ
+<#{ reading_vimrc.start_link }>
+
+### 関連リンク
+EOS
+
+puts CGI.escapeHTML(text.gsub(/\n/, "<br>"))
+
+end
+
+
+
 get '/reading_vimrc/vimplugin/yml' do
 	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 	log = reading_vimrc.start_link
@@ -58,7 +100,6 @@ get '/reading_vimrc/vimplugin/yml' do
 	yml = <<"EOS"
 - id: #{ reading_vimrc.id }
   date: #{ reading_vimrc.date.strftime("%Y-%m-%d") } 21:00
-  day: #{ wdays[reading_vimrc.date.wday] }
   plugins:
     - name: #{ github[1] }
       author: #{ github[0] }
@@ -83,6 +124,7 @@ post '/reading_vimrc' do
 		if (/^=== 第(\d+)回 vimrc読書会 ===/ =~ text || /^=== 第(\d+)回 Vimプラグイン読書会 ===/ =~ text) && owner?(speaker_id)
 			reading_vimrc.start to_lingr_link(e["message"]), $1
 			reading_vimrc.set_target text[/読むプラグイン: (https.*)\n/, 1]
+			reading_vimrc.set_target text[/本日のvimrc: (https.*)\n/, 1]
 			return "started"
 		end
 		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(speaker_id)

@@ -88,7 +88,7 @@ class ReadingVimrc
 	end
 
 	def set_target(target)
-		@target = target
+		@target = target unless target.empty?
 	end
 
 	def stop
