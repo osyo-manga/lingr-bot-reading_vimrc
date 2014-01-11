@@ -48,18 +48,21 @@ def to_lingr_link(message)
 end
 
 
-get '/reading_vimrc/yml' do
+get '/reading_vimrc/vimplugin/yml' do
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
+	github = reading_vimrc.target.split("/").drop(3)
+	url = "https://github.com/#{name}/#{author}"
+
 	yml = <<"EOS"
 - id: 
-  date: #{ Time.now.strftime("%Y-%m-%d") } 21:00
+  date: #{ reading_vimrc.date.strftime("%Y-%m-%d") } 21:00
   day: Sat
   plugins:
-    - name: 
-      author: 
-      url: 
-      hash: 
+    - name: #{ github[0] }
+      author: #{ github[1] }
+      url: #{ url }
+      hash: #{ github[3] }
   members:
 #{ member.map{ |m| "    - " + m }.join("\n") }
   log: #{ log }
@@ -76,8 +79,9 @@ post '/reading_vimrc' do
 		name = e["message"]["nickname"]
 		speaker_id = e["message"]["speaker_id"]
 		
-		if (/^=== 第\d+回 vimrc読書会 ===/ =~ text || /^=== 第\d+回 Vimプラグイン読書会 ===/ =~ text) && owner?(speaker_id)
-			reading_vimrc.start to_lingr_link(e["message"])
+		if (/^=== 第(\d+)回 vimrc読書会 ===/ =~ text || /^=== 第(\d+)回 Vimプラグイン読書会 ===/ =~ text) && owner?(speaker_id)
+			reading_vimrc.start to_lingr_link(e["message"]), $1
+			reading_vimrc.set_target text[/読むプラグイン: (https.*)\n/, 1]
 			return "started"
 		end
 		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(speaker_id)

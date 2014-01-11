@@ -58,6 +58,10 @@ end
 
 
 class ReadingVimrc
+	attr_reader :count
+	attr_reader :target
+	attr_reader :date
+
 	attr_reader :start_link
 	def initialize
 		@start_link = ""
@@ -65,17 +69,26 @@ class ReadingVimrc
 		@messages = []
 		@restore_cache = []
 		@chop = nil
+		@count = 0
+		@target = ""
+		@date = Time.now
 	end
 
 	def running?
 		@is_running_
 	end
 
-	def start(link = "")
+	def start(link = "", count = 0)
 		@is_running_ = true
 		@start_link = link
 		@chop = nil
+		@count = count
+		@date = Time.now
 		reset
+	end
+
+	def set_target(target)
+		@target = target
 	end
 
 	def stop
