@@ -52,7 +52,7 @@ get '/reading_vimrc/vimplugin/yml' do
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
 	github = reading_vimrc.target.split("/").drop(3)
-	url = "https://github.com/#{name}/#{author}"
+	url = "https://github.com/#{github[0]}/#{github[1]}"
 
 	yml = <<"EOS"
 - id: 
