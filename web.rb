@@ -83,9 +83,7 @@ category: archive
 
 ### 関連リンク
 EOS
-
-puts CGI.escapeHTML(text.gsub(/\n/, "<br>"))
-
+	CGI.escapeHTML(text.gsub(/\n/, "<br>"))
 end
 
 
