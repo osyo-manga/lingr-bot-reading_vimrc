@@ -58,7 +58,7 @@ get '/reading_vimrc/vimplugin/yml' do
 	yml = <<"EOS"
 - id: #{ reading_vimrc.id }
   date: #{ reading_vimrc.date.strftime("%Y-%m-%d") } 21:00
-  day: #{ wday[reading_vimrc.date.wday] }
+  day: #{ wdays[reading_vimrc.date.wday] }
   plugins:
     - name: #{ github[1] }
       author: #{ github[0] }
