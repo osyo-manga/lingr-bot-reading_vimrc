@@ -65,7 +65,7 @@ get '/reading_vimrc/yml' do
   log: #{ log }
   links:
 EOS
-	yml.gsub(/\n/, "<br>")
+	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
 end
 
 post '/reading_vimrc' do
