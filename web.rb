@@ -57,6 +57,7 @@ post '/reading_vimrc' do
 		speaker_id = e["message"]["speaker_id"]
 		
 		if /^=== 第\d+回 vimrc読書会 ===/ =~ text && owner?(speaker_id)
+		|| /^=== 第\d+回 Vimプラグイン読書会 ===/ =~ text && owner?(speaker_id)
 			reading_vimrc.start to_lingr_link(e["message"])
 			return "started"
 		end
