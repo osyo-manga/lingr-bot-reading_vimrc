@@ -53,7 +53,6 @@ get '/reading_vimrc/yml' do
 	member = reading_vimrc.members.sort
 	yml = <<"EOS"
 - id: 1
-  date: 2013-12-14 21:00
   date: #{ Time.now.strftime("%Y-%m-%d") } 21:00
   day: Sat
   plugins:
