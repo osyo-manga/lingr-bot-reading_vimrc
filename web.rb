@@ -49,18 +49,19 @@ end
 
 
 get '/reading_vimrc/vimplugin/yml' do
+	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
 	github = reading_vimrc.target.split("/").drop(3)
 	url = "https://github.com/#{github[0]}/#{github[1]}"
 
 	yml = <<"EOS"
-- id: 
+- id: #{ reading_vimrc.id }
   date: #{ reading_vimrc.date.strftime("%Y-%m-%d") } 21:00
-  day: Sat
+  day: #{ wday[reading_vimrc.date.wday] }
   plugins:
-    - name: #{ github[0] }
-      author: #{ github[1] }
+    - name: #{ github[1] }
+      author: #{ github[0] }
       url: #{ url }
       hash: #{ github[3] }
   members:

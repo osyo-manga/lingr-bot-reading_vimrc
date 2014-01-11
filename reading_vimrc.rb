@@ -58,7 +58,7 @@ end
 
 
 class ReadingVimrc
-	attr_reader :count
+	attr_reader :id
 	attr_reader :target
 	attr_reader :date
 
@@ -69,7 +69,7 @@ class ReadingVimrc
 		@messages = []
 		@restore_cache = []
 		@chop = nil
-		@count = 0
+		@id = 0
 		@target = ""
 		@date = Time.now
 	end
@@ -78,11 +78,11 @@ class ReadingVimrc
 		@is_running_
 	end
 
-	def start(link = "", count = 0)
+	def start(link = "", id = 0)
 		@is_running_ = true
 		@start_link = link
 		@chop = nil
-		@count = count
+		@id = id
 		@date = Time.now
 		reset
 	end
