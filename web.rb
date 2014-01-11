@@ -52,7 +52,7 @@ get '/reading_vimrc/yml' do
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
 	yml = <<"EOS"
-- id: 1
+- id: 
   date: #{ Time.now.strftime("%Y-%m-%d") } 21:00
   day: Sat
   plugins:
