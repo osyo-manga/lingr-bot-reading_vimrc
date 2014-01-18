@@ -50,6 +50,7 @@ end
 
 
 get '/reading_vimrc/vimrc/markdown' do
+	content_type :text
 	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 	wdays = ["日", "月", "火", "水", "木", "金", "土"]
 	log = reading_vimrc.start_link
@@ -83,12 +84,14 @@ category: archive
 
 ### 関連リンク
 EOS
-	CGI.escapeHTML(text).gsub(/\n/, "<br>")
+	text
+# 	CGI.escapeHTML(text).gsub(/\n/, "<br>")
 end
 
 
 
 get '/reading_vimrc/vimplugin/yml' do
+	content_type :text
 	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 	log = reading_vimrc.start_link
 	member = reading_vimrc.members.sort
@@ -108,7 +111,8 @@ get '/reading_vimrc/vimplugin/yml' do
   log: #{ log }
   links:
 EOS
-	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
+	yml
+# 	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
 end
 
 post '/reading_vimrc' do
