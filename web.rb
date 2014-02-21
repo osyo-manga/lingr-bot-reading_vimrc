@@ -108,13 +108,12 @@ end
 get '/reading_vimrc/vimrc/yml' do
 	content_type :text
 	status = next_reading_vimrc
-# 	status["members"] = reading_vimrc.members.sort
-# 	status["log"] = reading_vimrc.start_link
-# 	status["links"] = [reading_vimrc.chop_url]
-# 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
+	status["members"] = reading_vimrc.members.sort
+	status["log"] = reading_vimrc.start_link
+	status["links"] = [reading_vimrc.chop_url]
+	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
 
-# 	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
-	"homuhomu"
+	[status].to_yaml
 end
 
 
