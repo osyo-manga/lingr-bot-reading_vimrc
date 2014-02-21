@@ -21,10 +21,18 @@ def owner?(name)
 end
 
 
+def to_last_commits(url)
+	Octokit.list_commits(Octokit::Repository.from_url(url)).first['sha']
+end
+
 def get_yaml(url)
 	YAML.load open(url)
 end
 
+
+def next_reading_vimrc
+	get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
+end
 
 reading_vimrc = ReadingVimrc.new
 
@@ -100,7 +108,7 @@ end
 get '/reading_vimrc/vimrc/yml' do
 	content_type :text
 # 	github = reading_vimrc.target.split("/").drop(3)
-	status = get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
+	status = next_reading_vimrc
 	status["members"] = reading_vimrc.members.sort
 	status["log"] = reading_vimrc.start_link
 	status["links"] = [reading_vimrc.chop_url]
@@ -136,19 +144,6 @@ EOS
 # 	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
 end
 
-
-def to_last_commits(url)
-	Octokit.list_commits(Octokit::Repository.from_url(url)).first['sha']
-end
-
-def get_yaml(url)
-	YAML.load open(url)
-end
-
-
-def next_reading_vimrc
-	get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
-end
 
 
 def starting_reading_vimrc(reading_vimrc)
