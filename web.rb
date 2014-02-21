@@ -113,7 +113,7 @@ get '/reading_vimrc/vimrc/yml' do
 	status["links"] = [reading_vimrc.chop_url]
 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
 
-	[status].to_yaml
+	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
 
 
