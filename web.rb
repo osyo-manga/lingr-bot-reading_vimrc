@@ -160,7 +160,7 @@ def starting_reading_vimrc(reading_vimrc)
 	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
 
 	reading_vimrc.set_target link
-	reading_vimrc.set_donwload raw_link
+	reading_vimrc.set_download raw_link
 
 	<<"EOS"
 === 第#{reading["id"]}回 vimrc読書会 ===
