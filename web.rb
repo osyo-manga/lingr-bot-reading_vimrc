@@ -2,9 +2,12 @@
 # https://github.com/raa0121/raa0121-lingrbot/blob/master/dice.rb
 require 'sinatra'
 require 'json'
+require "yaml"
+require "open-uri"
 load "reading_vimrc.rb"
 
 
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 get '/' do
 	"Hello, world"
@@ -15,6 +18,11 @@ OWNER = ["manga_osyo", "thinca", "deris0126", "rbtnn", "LeafCage", "haya14busa"]
 
 def owner?(name)
 	!!OWNER.index(name)
+end
+
+
+def get_yaml(url)
+	YAML.load open(url)
 end
 
 
@@ -89,6 +97,19 @@ EOS
 end
 
 
+get '/reading_vimrc/vimrc/yml' do
+	content_type :text
+# 	github = reading_vimrc.target.split("/").drop(3)
+	status = get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
+	status["members"] = reading_vimrc.members.sort
+	status["log"] = reading_vimrc.start_link
+	status["links"] = [reading_vimrc.chop_url]
+	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
+
+	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
+end
+
+
 
 get '/reading_vimrc/vimplugin/yml' do
 	content_type :text
@@ -115,6 +136,46 @@ EOS
 # 	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
 end
 
+
+def to_last_commits(url)
+	Octokit.list_commits(Octokit::Repository.from_url(url)).first['sha']
+end
+
+def get_yaml(url)
+	YAML.load open(url)
+end
+
+
+def next_reading_vimrc
+	get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
+end
+
+
+def starting_reading_vimrc(reading_vimrc)
+	reading = next_reading_vimrc
+	vimrc   = reading["vimrcs"][0]
+	hash = vimrc["hash"] || to_last_commits(vimrc["url"])
+	link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
+	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
+	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
+
+	reading_vimrc.set_target link
+	reading_vimrc.set_donwload raw_link
+
+	<<"EOS"
+=== 第#{reading["id"]}回 vimrc読書会 ===
+- 途中参加/途中離脱OK。声をかける必要はありません
+- 読む順はとくに決めないので、好きなように読んで好きなように発言しましょう
+- vimrc 内の特定位置を参照する場合は行番号で L100 のように指定します
+- 特定の相手に発言/返事する場合は先頭に username: を付けます
+- 一通り読み終わったら、読み終わったことを宣言してください。終了の目安にします
+- ただの目安なので、宣言してからでも読み返して全然OKです
+本日のvimrc: #{ link }
+DL用リンク: #{ raw_link }
+EOS
+end
+
+
 post '/reading_vimrc' do
 	content_type :text
 	json = JSON.parse(request.body.string)
@@ -133,6 +194,10 @@ post '/reading_vimrc' do
 		if /^!reading_vimrc[\s　]start$/ =~ text && owner?(speaker_id)
 			reading_vimrc.start to_lingr_link(e["message"])
 			return "started"
+		end
+		if /^!reading_vimrc[\s　]start_reading_vimrc$/ =~ text && owner?(speaker_id)
+			reading_vimrc.start to_lingr_link(e["message"])
+			return starting_reading_vimrc(reading_vimrc)
 		end
 		if /^!reading_vimrc[\s　]stop$/ =~ text && owner?(speaker_id)
 			reading_vimrc.stop
