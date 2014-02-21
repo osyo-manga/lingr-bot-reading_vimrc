@@ -107,7 +107,7 @@ end
 
 get '/reading_vimrc/vimrc/yml' do
 	content_type :text
-# 	status = next_reading_vimrc
+	status = next_reading_vimrc
 # 	status["members"] = reading_vimrc.members.sort
 # 	status["log"] = reading_vimrc.start_link
 # 	status["links"] = [reading_vimrc.chop_url]
