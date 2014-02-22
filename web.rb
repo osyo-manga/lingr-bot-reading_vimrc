@@ -4,6 +4,7 @@ require 'sinatra'
 require 'json'
 require "yaml"
 require "open-uri"
+require 'octokit'
 load "reading_vimrc.rb"
 
 
@@ -21,7 +22,7 @@ def owner?(name)
 end
 
 
-def to_last_commits(url)
+def last_commit_hash(url)
 	Octokit.list_commits(Octokit::Repository.from_url(url)).first['sha']
 end
 
@@ -33,6 +34,30 @@ end
 def next_reading_vimrc
 	get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
 end
+
+
+def last_commi_link(vimrc)
+	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
+	vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
+end
+
+
+def last_commit_raw_link(vimrc)
+	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
+	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
+	raw_link.sub(/blob\/master\//, hash + "/")
+end
+
+
+def as_github_link(vimrc)
+	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
+	link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
+	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
+	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
+	{ :link => link, :raw_link => raw_link, :name => vimrc["name"] }
+end
+
+
 
 reading_vimrc = ReadingVimrc.new
 
@@ -65,44 +90,44 @@ end
 
 
 
-get '/reading_vimrc/vimrc/markdown' do
-	content_type :text
-	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-	wdays = ["日", "月", "火", "水", "木", "金", "土"]
-	log = reading_vimrc.start_link
-	member = reading_vimrc.members.sort
-	github = reading_vimrc.target.split("/").drop(3)
-	url = "https://github.com/#{github[0]}"
-
-text = <<"EOS"
----
-layout: archive
-title: 第#{ reading_vimrc.id }回 vimrc読書会
-category: archive
----
-
-### 日時
-#{ reading_vimrc.date.strftime("%Y/%m/%d") }(土) 23:00-
-
-### vimrc
-[#{ github[0] }](#{ url }) さんの vimrc を読みました。
-
-- [vimrc](#{ reading_vimrc.target }) ([ダウンロード](#{ reading_vimrc.download }))
-
-### 参加者リスト
-
-#{ member.length }名。
-
-#{ member.map{ |m| "- " + m }.join("\n") }
-
-### ログ
-<#{ reading_vimrc.start_link }>
-
-### 関連リンク
-EOS
-	text
-# 	CGI.escapeHTML(text).gsub(/\n/, "<br>")
-end
+# get '/reading_vimrc/vimrc/markdown' do
+# 	content_type :text
+# 	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+# 	wdays = ["日", "月", "火", "水", "木", "金", "土"]
+# 	log = reading_vimrc.start_link
+# 	member = reading_vimrc.members.sort
+# 	github = reading_vimrc.target.split("/").drop(3)
+# 	url = "https://github.com/#{github[0]}"
+#
+# text = <<"EOS"
+# ---
+# layout: archive
+# title: 第#{ reading_vimrc.id }回 vimrc読書会
+# category: archive
+# ---
+#
+# ### 日時
+# #{ reading_vimrc.date.strftime("%Y/%m/%d") }(土) 23:00-
+#
+# ### vimrc
+# [#{ github[0] }](#{ url }) さんの vimrc を読みました。
+#
+# - [vimrc](#{ reading_vimrc.target }) ([ダウンロード](#{ reading_vimrc.download }))
+#
+# ### 参加者リスト
+#
+# #{ member.length }名。
+#
+# #{ member.map{ |m| "- " + m }.join("\n") }
+#
+# ### ログ
+# <#{ reading_vimrc.start_link }>
+#
+# ### 関連リンク
+# EOS
+# 	text
+# # 	CGI.escapeHTML(text).gsub(/\n/, "<br>")
+# end
 
 
 get '/reading_vimrc/vimrc/yml' do
@@ -111,7 +136,13 @@ get '/reading_vimrc/vimrc/yml' do
 	status["members"] = reading_vimrc.members.sort
 	status["log"] = reading_vimrc.start_link
 	status["links"] = reading_vimrc.chop_url.empty? ? nil : [reading_vimrc.chop_url]
-	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
+	if reading_vimrc.target.is_a? Array
+		vimrcs  = reading_vimrc.target
+	else
+		vimrcs  = status["vimrcs"].map(&method(:as_github_link))
+	end
+	status["vimrcs"] = vimrcs.map{ |vimrc| { "name" => vimrc[:name], "url" => vimrc[:link] } }
+# 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
 
 	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
@@ -147,14 +178,10 @@ end
 
 def starting_reading_vimrc(reading_vimrc)
 	reading = next_reading_vimrc
-	vimrc   = reading["vimrcs"][0]
-	hash = vimrc["hash"] || to_last_commits(vimrc["url"])
-	link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
-	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
-	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
+	vimrcs  = reading["vimrcs"].map(&method(:as_github_link))
 
-	reading_vimrc.set_target link
-	reading_vimrc.set_download raw_link
+	reading_vimrc.set_target vimrcs
+# 	reading_vimrc.set_download raw_link
 
 	<<"EOS"
 === 第#{reading["id"]}回 vimrc読書会 ===
@@ -164,8 +191,11 @@ def starting_reading_vimrc(reading_vimrc)
 - 特定の相手に発言/返事する場合は先頭に username: を付けます
 - 一通り読み終わったら、読み終わったことを宣言してください。終了の目安にします
 - ただの目安なので、宣言してからでも読み返して全然OKです
-本日のvimrc: #{ link }
-DL用リンク: #{ raw_link }
+#{
+	vimrcs.map { |vimrc|
+		"#{vimrc[:name]}: #{vimrc[:link]}\nDL用リンク: #{vimrc[:raw_link]}"
+	}.join("\n")
+}
 EOS
 end
 
