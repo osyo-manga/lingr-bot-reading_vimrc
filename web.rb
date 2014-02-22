@@ -192,6 +192,26 @@ def starting_reading_vimrc(reading_vimrc)
 - 一通り読み終わったら、読み終わったことを宣言してください。終了の目安にします
 - ただの目安なので、宣言してからでも読み返して全然OKです
 #{
+if reading["part"] && reading["part"] == "前編"
+	<<"EOS"
+- 今回は#{reading["part"]}です。終了時間になったら、途中でも強制終了します
+- 続きは来週読みます
+- いつも通り各自のペースで読むので、どこまで読んだか覚えておきましょう
+EOS
+elsif reading["part"] && reading["part"] == "中編"
+	<<"EOS"
+- 今回は#{reading["part"]}です。終了時間になったら、途中でも強制終了します
+- 前回参加していた方は続きから、参加していなかったら最初からになります
+- 続きは来週読みます
+- いつも通り各自のペースで読むので、どこまで読んだか覚えておきましょう
+EOS
+elsif reading["part"] && reading["part"] == "後編"
+	<<"EOS"
+- 今回は#{reading["part"]}です。前回参加した人は続きから読んでください
+EOS
+end
+}
+#{
 	vimrcs.map { |vimrc|
 		"#{vimrc[:name]}: #{vimrc[:link]}\nDL用リンク: #{vimrc[:raw_link]}"
 	}.join("\n")
