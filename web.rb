@@ -210,8 +210,7 @@ elsif reading["part"] && reading["part"] == "後編"
 - 今回は#{reading["part"]}です。前回参加した人は続きから読んでください
 EOS
 end
-}
-#{
+}#{
 	vimrcs.map { |vimrc|
 		"#{vimrc[:name]}: #{vimrc[:link]}\nDL用リンク: #{vimrc[:raw_link]}"
 	}.join("\n")
