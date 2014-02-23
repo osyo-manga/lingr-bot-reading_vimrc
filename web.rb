@@ -32,7 +32,7 @@ end
 
 
 def next_reading_vimrc
-	get_yaml("https://raw.github.com/osyo-manga/reading-vimrc/gh-pages/_data/next.yml")[0]
+	get_yaml("https://raw.github.com/vim-jp/reading-vimrc/gh-pages/_data/next.yml")[0]
 end
 
 
