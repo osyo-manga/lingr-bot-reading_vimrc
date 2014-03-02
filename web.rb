@@ -231,7 +231,7 @@ def starting_reading_vimplugin(reading_vimrc)
 	reading_vimrc.set_target plugins
 
 	<<"EOS"
-=== 第#{reading["id"]}回 vimrc読書会 ===
+=== 第#{reading["id"]}回 Vimプラグイン読書会 ===
 - 途中参加/途中離脱OK。声をかける必要はありません
 - 読む順はとくに決めないので、好きなように読んで好きなように発言しましょう
 - 特定の相手に発言/返事する場合は先頭に username: を付けます
