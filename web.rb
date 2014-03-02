@@ -36,6 +36,11 @@ def next_reading_vimrc
 end
 
 
+def next_reading_plugin
+	get_yaml("https://raw.github.com/haya14busa/reading-vimplugin/gh-pages/_data/next.yml")[0]
+end
+
+
 def last_commi_link(vimrc)
 	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
 	vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
@@ -219,6 +224,29 @@ EOS
 end
 
 
+def starting_reading_vimplugin(reading_vimrc)
+	reading = next_reading_plugin
+	plugins  = reading["plugins"].map(&method(:as_github_link))
+
+	reading_vimrc.set_target plugins
+
+	<<"EOS"
+=== 第#{reading["id"]}回 vimrc読書会 ===
+- 途中参加/途中離脱OK。声をかける必要はありません
+- 読む順はとくに決めないので、好きなように読んで好きなように発言しましょう
+- 特定の相手に発言/返事する場合は先頭に username: を付けます
+- 一通り読み終わったら、読み終わったことを宣言してください。終了の目安にします
+- ただの目安なので、宣言してからでも読み返して全然OKです
+- 目的:#{ reading["aim"] }
+#{
+	plugins.map { |plugin|
+		"#{plugin[:name]}: #{plugin[:link]}\nDL用リンク: #{plugin[:raw_link]}"
+	}.join("\n")
+}
+EOS
+end
+
+
 post '/reading_vimrc' do
 	content_type :text
 	json = JSON.parse(request.body.string)
@@ -240,7 +268,11 @@ post '/reading_vimrc' do
 		end
 		if /^!reading_vimrc[\s　]start_reading_vimrc$/ =~ text && owner?(speaker_id)
 			reading_vimrc.start to_lingr_link(e["message"])
-			return starting_reading_vimrc(reading_vimrc)
+			return starting_reading_vimrc(reading_vimrc)[/(.*)\n/m, 1]
+		end
+		if /^!reading_vimrc[\s　]start_reading_vimplugin$/ =~ text && owner?(speaker_id)
+			reading_vimrc.start to_lingr_link(e["message"])
+			return starting_reading_vimplugin(reading_vimrc)[/(.*)\n/m, 1]
 		end
 		if /^!reading_vimrc[\s　]stop$/ =~ text && owner?(speaker_id)
 			reading_vimrc.stop
