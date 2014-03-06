@@ -59,7 +59,7 @@ def as_github_link(vimrc)
 	link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
 	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
 	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
-	{ :link => link, :raw_link => raw_link, :name => vimrc["name"] }
+	{ :link => link, :raw_link => raw_link, :name => vimrc["name"], :base => vimrc, :hash => hash }
 end
 
 
@@ -114,8 +114,6 @@ end
 # ### 日時
 # #{ reading_vimrc.date.strftime("%Y/%m/%d") }(土) 23:00-
 #
-# ### vimrc
-# [#{ github[0] }](#{ url }) さんの vimrc を読みました。
 #
 # - [vimrc](#{ reading_vimrc.target }) ([ダウンロード](#{ reading_vimrc.download }))
 #
@@ -147,7 +145,6 @@ get '/reading_vimrc/vimrc/yml' do
 		vimrcs  = status["vimrcs"].map(&method(:as_github_link))
 	end
 	status["vimrcs"] = vimrcs.map{ |vimrc| { "name" => vimrc[:name], "url" => vimrc[:link] } }
-# 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
 
 	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
@@ -156,27 +153,19 @@ end
 
 get '/reading_vimrc/vimplugin/yml' do
 	content_type :text
-	wdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-	log = reading_vimrc.start_link
-	member = reading_vimrc.members.sort
-	github = reading_vimrc.target.split("/").drop(3)
-	url = "https://github.com/#{github[0]}/#{github[1]}"
+	status = next_reading_plugin
+	status["members"] = reading_vimrc.members.sort
+	status["log"] = reading_vimrc.start_link
+	status["links"] = reading_vimrc.chop_url.empty? ? nil : [reading_vimrc.chop_url]
+	if reading_vimrc.target.is_a? Array
+		plugins  = reading_vimrc.target
+	else
+		plugins = status["plugins"].map(&method(:as_github_link))
+	end
+	status["plugins"] = plugins.map{ |plugin| { "name" => plugin[:base]["name"], "url" => plugin[:base]["url"], "author" => plugin[:base]["author"], "hash" => plugin[:hash] } }
+# 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
 
-	yml = <<"EOS"
-- id: #{ reading_vimrc.id }
-  date: #{ reading_vimrc.date.strftime("%Y-%m-%d") } 21:00
-  plugins:
-    - name: #{ github[1] }
-      author: #{ github[0] }
-      url: #{ url }
-      hash: #{ github[3] }
-  members:
-#{ member.map{ |m| "    - " + m }.join("\n") }
-  log: #{ log }
-  links:
-EOS
-	yml
-# 	yml.gsub(/\n/, "<br>").gsub(/ /, "&nbsp;")
+	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
 
 
