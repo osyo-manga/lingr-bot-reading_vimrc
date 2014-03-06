@@ -59,7 +59,7 @@ def as_github_link(vimrc)
 	if vimrc["url"] =~ /blob\/master\//
 		link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
 	else
-		link = vimrc["url"] + "tree/#{hash}"
+		link = vimrc["url"] + "/tree/#{hash}"
 	end
 	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
 	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
@@ -231,7 +231,7 @@ def starting_reading_vimplugin(reading_vimrc)
 - 目的:#{ reading["aim"] }
 #{
 	plugins.map { |plugin|
-		"#{plugin[:name]}: #{plugin[:link]}}"
+		"#{plugin[:name]}: #{plugin[:link]}"
 	}.join("\n")
 }
 EOS
