@@ -56,7 +56,11 @@ end
 
 def as_github_link(vimrc)
 	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
-	link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
+	if vimrc["url"] =~ /blob\/master\//
+		link = vimrc["url"].sub(/blob\/master\//, "blob/" + hash + "/")
+	else
+		link = vimrc["url"] + "tree/#{hash}"
+	end
 	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
 	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
 	{ :link => link, :raw_link => raw_link, :name => vimrc["name"], :base => vimrc, :hash => hash }
@@ -163,8 +167,6 @@ get '/reading_vimrc/vimplugin/yml' do
 		plugins = status["plugins"].map(&method(:as_github_link))
 	end
 	status["plugins"] = plugins.map{ |plugin| { "name" => plugin[:base]["name"], "url" => plugin[:base]["url"], "author" => plugin[:base]["author"], "hash" => plugin[:hash] } }
-# 	status["vimrcs"] = [{ "name" => status["vimrcs"][0]["name"], "url" => reading_vimrc.target }]
-
 	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
 
@@ -229,7 +231,7 @@ def starting_reading_vimplugin(reading_vimrc)
 - 目的:#{ reading["aim"] }
 #{
 	plugins.map { |plugin|
-		"#{plugin[:name]}: #{plugin[:link]}\nDL用リンク: #{plugin[:raw_link]}"
+		"#{plugin[:name]}: #{plugin[:link]}}"
 	}.join("\n")
 }
 EOS
