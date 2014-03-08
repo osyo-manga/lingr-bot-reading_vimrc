@@ -85,6 +85,8 @@ vimrc読書会で発言した人を集計するための bot です
 "help"    : 使い方を出力
 "chop {raw.github url}" : chop に url の内容をポストします（owner）
 "chop_url" : chop page
+"start_reading_vimrc" : vimrc読書会を開始します（owner）
+"start_reading_vimplugin" : Vimプラグイン読書会を開始します（owner）
 EOS
 
 
