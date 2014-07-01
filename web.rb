@@ -96,7 +96,7 @@ end
 
 def to_lingr_link(message)
 	time = message["timestamp"].match(/(.*)T/).to_a[1].gsub(/-/, '/')
-	return "http://lingr.com/room/#{message["room"]}/archives#message-#{message["id"]}"
+	return "http://lingr.com/room/#{message["room"]}/archives/#{time}#message-#{message["id"]}"
 end
 
 
