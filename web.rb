@@ -150,7 +150,7 @@ get '/reading_vimrc/vimrc/yml' do
 	else
 		vimrcs  = status["vimrcs"].map(&method(:as_github_link))
 	end
-	status["vimrcs"] = vimrcs.map{ |vimrc| { "name" => vimrc[:name], "url" => vimrc[:link] } }
+	status["vimrcs"] = vimrcs.map{ |vimrc| { "name" => vimrc[:name], "url" => vimrc[:link], "raw_url" => vimrc[:raw_link] } }
 
 	[status].to_yaml[/^---\n((\n|.)*)$/, 1]
 end
