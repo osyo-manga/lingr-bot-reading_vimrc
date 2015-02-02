@@ -32,12 +32,12 @@ end
 
 
 def next_reading_vimrc
-	get_yaml("https://raw.github.com/vim-jp/reading-vimrc/gh-pages/_data/next.yml")[0]
+	get_yaml("https://raw.githubusercontent.com/vim-jp/reading-vimrc/gh-pages/_data/next.yml")[0]
 end
 
 
 def next_reading_plugin
-	get_yaml("https://raw.github.com/haya14busa/reading-vimplugin/gh-pages/_data/next.yml")[0]
+	get_yaml("https://raw.githubusercontent.com/haya14busa/reading-vimplugin/gh-pages/_data/next.yml")[0]
 end
 
 
@@ -49,7 +49,7 @@ end
 
 def last_commit_raw_link(vimrc)
 	hash = vimrc["hash"] || last_commit_hash(vimrc["url"])
-	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
+	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.githubusercontent")
 	raw_link.sub(/blob\/master\//, hash + "/")
 end
 
@@ -61,7 +61,7 @@ def as_github_link(vimrc)
 	else
 		link = vimrc["url"] + "/tree/#{hash}"
 	end
-	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.github")
+	raw_link = vimrc["url"].sub(/https:\/\/github/, "https://raw.githubusercontent")
 	raw_link = raw_link.sub(/blob\/master\//, hash + "/")
 	{ :link => link, :raw_link => raw_link, :name => vimrc["name"], :base => vimrc, :hash => hash }
 end
